@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	d "github.com/bwmarrin/discordgo"
-	"github.com/chickeniq/commandlink/command"
+	"github.com/guild-link/commandlink/command"
 )
 
 const (

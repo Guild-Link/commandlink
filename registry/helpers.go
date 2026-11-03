@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	d "github.com/bwmarrin/discordgo"
-	"github.com/chickeniq/commandlink/command"
-	"github.com/chickeniq/commandlink/ui"
+	"github.com/guild-link/commandlink/command"
+	"github.com/guild-link/commandlink/ui"
 )
 
 func (f IdentifyProvider) newCtx(ctx context.Context) (*command.Ctx, error) {

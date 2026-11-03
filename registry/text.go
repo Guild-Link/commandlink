@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/chickeniq/commandlink/command"
+	"github.com/guild-link/commandlink/command"
 )
 
 func (r *Registry) Text(ctx context.Context, prefix, content string, identify IdentifyProvider) (string, error) {

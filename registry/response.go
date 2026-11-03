@@ -7,7 +7,7 @@ import (
 	"time"
 
 	d "github.com/bwmarrin/discordgo"
-	"github.com/chickeniq/commandlink/command"
+	"github.com/guild-link/commandlink/command"
 )
 
 func (i *interaction) reply(run func(*command.Ctx) (*command.Response, error)) {

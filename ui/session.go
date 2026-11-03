@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	d "github.com/bwmarrin/discordgo"
-	"github.com/chickeniq/commandlink/command"
+	"github.com/guild-link/commandlink/command"
 )
 
 func New(c InteractiveCommand, prefix string) *Session {

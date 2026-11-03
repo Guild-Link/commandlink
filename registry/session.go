@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"errors"
 
-	"github.com/chickeniq/commandlink/command"
-	"github.com/chickeniq/commandlink/ui"
+	"github.com/guild-link/commandlink/command"
+	"github.com/guild-link/commandlink/ui"
 )
 
 func (r *Registry) startSession(ctx *command.Ctx, c ui.InteractiveCommand, def command.Definition) (*command.Response, error) {

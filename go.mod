@@ -1,4 +1,4 @@
-module github.com/chickeniq/commandlink
+module github.com/guild-link/commandlink
 
 go 1.26.7
 

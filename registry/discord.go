@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	d "github.com/bwmarrin/discordgo"
-	"github.com/chickeniq/commandlink/command"
-	"github.com/chickeniq/commandlink/ui"
+	"github.com/guild-link/commandlink/command"
+	"github.com/guild-link/commandlink/ui"
 )
 
 func (r *Registry) Handle(ctx context.Context, session *d.Session, event *d.InteractionCreate, identify IdentifyProvider) {

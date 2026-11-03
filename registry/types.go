@@ -5,8 +5,8 @@ import (
 	"time"
 
 	d "github.com/bwmarrin/discordgo"
-	"github.com/chickeniq/commandlink/command"
-	"github.com/chickeniq/commandlink/ui"
+	"github.com/guild-link/commandlink/command"
+	"github.com/guild-link/commandlink/ui"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 )
 
