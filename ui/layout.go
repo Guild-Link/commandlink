@@ -28,13 +28,15 @@ func (c *container) build() []d.MessageComponent {
 }
 
 type text struct {
+	session *Session
+	button  *button
 	content string
 	lines   []string
 	empty   string
 }
 
 func (u *UI) Text(content string) *text {
-	t := &text{content: content}
+	t := &text{session: u.session, content: content}
 	u.add(t)
 	return t
 }
@@ -53,6 +55,11 @@ func (t *text) Empty(empty string) *text {
 	return t
 }
 
+func (t *text) Button(label string) *button {
+	t.button = (&UI{session: t.session, target: new([]node)}).Button(label)
+	return t.button
+}
+
 func (t *text) build() []d.MessageComponent {
 	lines := t.lines
 	if len(lines) == 0 && t.empty != "" {
@@ -62,7 +69,11 @@ func (t *text) build() []d.MessageComponent {
 	if t.content != "" {
 		lines = append([]string{t.content}, lines...)
 	}
-	return []d.MessageComponent{d.TextDisplay{Content: strings.Join(lines, "\n")}}
+	display := d.TextDisplay{Content: strings.Join(lines, "\n")}
+	if t.button != nil {
+		return []d.MessageComponent{d.Section{Components: []d.MessageComponent{display}, Accessory: t.button.build()}}
+	}
+	return []d.MessageComponent{display}
 }
 
 type separator struct {
