@@ -59,12 +59,20 @@ func values(options []*d.ApplicationCommandInteractionDataOption) command.Values
 	return values
 }
 
-func inputs(components []d.MessageComponent) command.Values {
+func inputs(components []d.MessageComponent, attachments map[string]*d.MessageAttachment) command.Values {
 	inputs := command.Values{}
 	for _, component := range components {
 		if label, ok := component.(*d.Label); ok {
 			if input, ok := label.Component.(*d.TextInput); ok {
 				inputs[input.CustomID] = command.ValueOf(input.Value)
+			}
+
+			if input, ok := label.Component.(*d.FileUpload); ok {
+				var urls []string
+				for _, id := range input.Values {
+					urls = append(urls, attachments[id].URL)
+				}
+				inputs[input.CustomID] = command.ValueOf(urls)
 			}
 		}
 	}

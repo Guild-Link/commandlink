@@ -9,9 +9,19 @@ import (
 
 type modal struct {
 	u        *UI
-	fields   []*textInput
+	fields   []field
 	modal    d.InteractionResponseData
 	onSubmit func() error
+}
+
+type field interface {
+	field(id string) (d.MessageComponent, func(command.Values) error)
+}
+
+type fileInput struct {
+	label string
+	input d.FileUpload
+	value *[]string
 }
 
 type textInput struct {
@@ -31,7 +41,7 @@ func (m *modal) Text(text string) *modal {
 	return m
 }
 
-func (m *modal) Input(t *textInput) *modal {
+func (m *modal) Input(t field) *modal {
 	m.fields = append(m.fields, t)
 	return m
 }
@@ -105,5 +115,23 @@ func (t *textInput) field(id string) (d.MessageComponent, func(command.Values) e
 	return d.Label{Label: t.label, Description: t.description, Component: input}, func(v command.Values) error {
 		*t.value = v.Get(id).String()
 		return call(t.onChange)
+	}
+}
+
+func FileInput(label string, value *[]string) *fileInput {
+	return &fileInput{label: label, input: d.FileUpload{MaxValues: 10}, value: value}
+}
+
+func (f *fileInput) Optional() *fileInput {
+	f.input.Required = new(false)
+	return f
+}
+
+func (f *fileInput) field(id string) (d.MessageComponent, func(command.Values) error) {
+	input := f.input
+	input.CustomID = id
+	return d.Label{Label: f.label, Component: input}, func(v command.Values) error {
+		*f.value = v.Get(id).Strings()
+		return nil
 	}
 }

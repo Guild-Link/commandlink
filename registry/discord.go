@@ -22,7 +22,7 @@ func (r *Registry) Handle(ctx context.Context, session *d.Session, event *d.Inte
 		i.resumeSession(data.CustomID, ui.Event{Selected: data.Values})
 	case d.InteractionModalSubmit:
 		modal := event.ModalSubmitData()
-		i.resumeSession(modal.CustomID, ui.Event{Inputs: inputs(modal.Components)})
+		i.resumeSession(modal.CustomID, ui.Event{Inputs: inputs(modal.Components, modal.Resolved.Attachments)})
 	}
 }
 
