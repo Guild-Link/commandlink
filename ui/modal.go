@@ -104,6 +104,11 @@ func (t *textInput) Paragraph() *textInput {
 	return t
 }
 
+func (t *textInput) MaxLength(maxLength int) *textInput {
+	t.input.MaxLength = maxLength
+	return t
+}
+
 func (t *textInput) Optional() *textInput {
 	t.input.Required = new(false)
 	return t
@@ -120,6 +125,11 @@ func (t *textInput) field(id string) (d.MessageComponent, func(command.Values) e
 
 func FileInput(label string, value *[]string) *fileInput {
 	return &fileInput{label: label, input: d.FileUpload{MaxValues: 10}, value: value}
+}
+
+func (f *fileInput) Max(maxValues int) *fileInput {
+	f.input.MaxValues = maxValues
+	return f
 }
 
 func (f *fileInput) Optional() *fileInput {
