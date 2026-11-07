@@ -89,6 +89,11 @@ func (t *textInput) Placeholder(placeholder string) *textInput {
 	return t
 }
 
+func (t *textInput) Paragraph() *textInput {
+	t.input.Style = d.TextInputParagraph
+	return t
+}
+
 func (t *textInput) Optional() *textInput {
 	t.input.Required = new(false)
 	return t
