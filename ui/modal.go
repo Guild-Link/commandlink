@@ -127,8 +127,8 @@ func FileInput(label string, value *[]string) *fileInput {
 	return &fileInput{label: label, input: d.FileUpload{MaxValues: 10}, value: value}
 }
 
-func (f *fileInput) Max(maxValues int) *fileInput {
-	f.input.MaxValues = maxValues
+func (f *fileInput) MaxFiles(maxFiles int) *fileInput {
+	f.input.MaxValues = maxFiles
 	return f
 }
 
