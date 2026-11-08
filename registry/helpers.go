@@ -11,12 +11,12 @@ import (
 )
 
 func (f IdentifyProvider) newCtx(ctx context.Context) (*command.Ctx, error) {
-	user, serverID, err := f(ctx)
+	id, err := f(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &command.Ctx{Context: ctx, User: user, ServerID: serverID}, nil
+	return &command.Ctx{Context: ctx, User: id.User, ServerID: id.ServerID, Source: id.Source}, nil
 }
 
 func validate(c command.Command, def command.Definition) error {

@@ -23,7 +23,13 @@ type Registry struct {
 	timeout  time.Duration
 }
 
-type IdentifyProvider func(context.Context) (command.User, string, error)
+type IdentifyProvider func(context.Context) (Identity, error)
+
+type Identity struct {
+	User     command.User
+	ServerID string
+	Source   string
+}
 
 type entry struct {
 	new func() command.Command
