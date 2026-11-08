@@ -20,7 +20,7 @@ func (s *Session) Handle(ctx *command.Ctx, event Event) (*command.Response, erro
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.open = nil
+	s.modal = nil
 	s.ctx = *ctx
 
 	var failed error
@@ -28,24 +28,25 @@ func (s *Session) Handle(ctx *command.Ctx, event Event) (*command.Response, erro
 		failed = handler(event)
 	}
 
-	if s.open != nil && failed == nil {
-		return &command.Response{Modal: s.open}, nil
+	if s.modal != nil && failed == nil {
+		return &command.Response{Modal: s.modal}, nil
 	}
 
-	s.open = nil
+	s.modal = nil
 	return s.render(failed)
 }
 
 func (s *Session) render(failed error) (*command.Response, error) {
-	u := &UI{session: s, target: new([]node)}
-	s.pending, s.selects = map[string]func(Event) error{}, 0
+	u := newUI(s)
+	s.pending = map[string]func(Event) error{}
+	s.selectCount = 0
 	if err := s.command.Interactive(&s.ctx, u); err != nil {
 		s.handlers = map[string]func(Event) error{}
 		return nil, err
 	}
 
-	if s.open != nil {
-		return &command.Response{Modal: s.open}, nil
+	if s.modal != nil {
+		return &command.Response{Modal: s.modal}, nil
 	}
 
 	s.handlers = s.pending
@@ -53,8 +54,12 @@ func (s *Session) render(failed error) (*command.Response, error) {
 }
 
 func (s *Session) id() string {
-	s.next++
-	return s.prefix + ":" + strconv.FormatInt(int64(s.next), 36)
+	s.lastID++
+	return s.prefix + ":" + strconv.FormatInt(int64(s.lastID), 36)
+}
+
+func newUI(s *Session) *UI {
+	return &UI{session: s, target: new([]node)}
 }
 
 func (u *UI) handler(handler func(Event) error) string {

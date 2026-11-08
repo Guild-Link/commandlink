@@ -16,8 +16,8 @@ type selectMenu struct {
 }
 
 func (u *UI) Select(value *string) *selectMenu {
-	s := &selectMenu{session: u.session, index: u.session.selects, value: value}
-	u.session.selects++
+	s := &selectMenu{session: u.session, index: u.session.selectCount, value: value}
+	u.session.selectCount++
 	s.menu.CustomID = u.handler(func(e Event) error {
 		if s.menu.Disabled {
 			return nil
@@ -86,14 +86,14 @@ func (s *selectMenu) Index() int {
 }
 
 func (s *selectMenu) build() []d.MessageComponent {
-	if !s.typed() && len(s.menu.Options) == 0 {
+	if !s.autoPopulated() && len(s.menu.Options) == 0 {
 		return nil
 	}
 	return []d.MessageComponent{d.ActionsRow{Components: []d.MessageComponent{s.preselected()}}}
 }
 
 func (s *selectMenu) selected() []string {
-	if s.typed() {
+	if s.autoPopulated() {
 		if *s.value == "" {
 			return nil
 		}
@@ -149,7 +149,7 @@ func (s *selectMenu) optional() bool {
 	return s.menu.MinValues != nil && *s.menu.MinValues == 0
 }
 
-func (s *selectMenu) typed() bool {
+func (s *selectMenu) autoPopulated() bool {
 	return s.menu.Type() != d.SelectMenuComponent
 }
 
@@ -160,7 +160,7 @@ func (s *selectMenu) preselected() d.SelectMenu {
 		menu.Options[i].Default = slices.Contains(selected, option.Value)
 	}
 
-	if !s.typed() {
+	if !s.autoPopulated() {
 		if len(selected) > 0 && command.OptionIndex(menu.Options, selected[0]) < 0 {
 			menu.Placeholder = s.menu.Options[command.OptionIndex(s.menu.Options, selected[0])].Label
 		}

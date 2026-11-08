@@ -54,7 +54,7 @@ func (r *Registry) help(prefix string, user command.User) string {
 	var usages []string
 	skips := false
 	for name, e := range r.commands {
-		if _, ok := e.new().(command.TextCommand); !ok || e.def.Name != name || !user.HasPermission(e.def.Permission) {
+		if _, ok := e.new().(command.TextCommand); !ok || !user.HasPermission(e.def.Permission) {
 			continue
 		}
 

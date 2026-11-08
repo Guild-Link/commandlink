@@ -15,7 +15,7 @@ type modal struct {
 }
 
 type field interface {
-	field(id string) (d.MessageComponent, func(command.Values) error)
+	build(id string) (d.MessageComponent, func(command.Values) error)
 }
 
 type fileInput struct {
@@ -54,11 +54,12 @@ func (m *modal) OnSubmit(onSubmit func() error) *modal {
 func (m *modal) Open() error {
 	s := m.u.session
 	modal := m.modal
-	modal.CustomID, modal.Components = s.id(), slices.Clone(modal.Components)
+	modal.CustomID = s.id()
+	modal.Components = slices.Clone(modal.Components)
 
 	var submits []func(command.Values) error
 	for _, f := range m.fields {
-		component, submit := f.field(s.id())
+		component, submit := f.build(s.id())
 		modal.Components = append(modal.Components, component)
 		submits = append(submits, submit)
 	}
@@ -75,7 +76,7 @@ func (m *modal) Open() error {
 		}
 		return m.onSubmit()
 	}
-	s.open = &modal
+	s.modal = &modal
 	return nil
 }
 
@@ -114,7 +115,7 @@ func (t *textInput) Optional() *textInput {
 	return t
 }
 
-func (t *textInput) field(id string) (d.MessageComponent, func(command.Values) error) {
+func (t *textInput) build(id string) (d.MessageComponent, func(command.Values) error) {
 	input := t.input
 	input.CustomID = id
 	return d.Label{Label: t.label, Description: t.description, Component: input}, func(v command.Values) error {
@@ -137,7 +138,7 @@ func (f *fileInput) Optional() *fileInput {
 	return f
 }
 
-func (f *fileInput) field(id string) (d.MessageComponent, func(command.Values) error) {
+func (f *fileInput) build(id string) (d.MessageComponent, func(command.Values) error) {
 	input := f.input
 	input.CustomID = id
 	return d.Label{Label: f.label, Component: input}, func(v command.Values) error {

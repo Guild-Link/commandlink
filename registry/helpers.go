@@ -19,7 +19,7 @@ func (f IdentifyProvider) newCtx(ctx context.Context) (*command.Ctx, error) {
 	return &command.Ctx{Context: ctx, User: user, ServerID: serverID}, nil
 }
 
-func check(c command.Command, def command.Definition) error {
+func validate(c command.Command, def command.Definition) error {
 	_, interactive := c.(ui.InteractiveCommand)
 	_, text := c.(command.TextCommand)
 

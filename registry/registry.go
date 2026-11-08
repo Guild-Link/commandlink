@@ -18,21 +18,26 @@ func New(commands []func() command.Command, timeout, ttl time.Duration) (*Regist
 	r := &Registry{
 		sessions: expirable.NewLRU[string, *session](0, nil, ttl),
 		commands: make(map[string]entry, len(commands)),
+		aliases:  map[string]string{},
 		timeout:  timeout,
 	}
 
 	for _, f := range commands {
 		c := f()
 		def := c.Definition()
-		if err := check(c, def); err != nil {
+		if err := validate(c, def); err != nil {
 			return nil, err
 		}
 
 		for _, name := range append([]string{def.Name}, def.Aliases...) {
-			if _, ok := r.commands[name]; ok {
+			if c, _ := r.command(name); c != nil {
 				return nil, fmt.Errorf("command %q: name %q is already used", def.Name, name)
 			}
-			r.commands[name] = entry{def: def, new: f}
+		}
+
+		r.commands[def.Name] = entry{def: def, new: f}
+		for _, alias := range def.Aliases {
+			r.aliases[alias] = def.Name
 		}
 	}
 
@@ -45,9 +50,9 @@ func Cmd[T any, P ptr[T]](c T) func() command.Command {
 
 func (r *Registry) Register(ctx context.Context, session *d.Session, appID, guildID string) error {
 	var commands []*d.ApplicationCommand
-	for name, e := range r.commands {
+	for _, e := range r.commands {
 		def := e.def
-		if _, ok := e.new().(ui.InteractiveCommand); !ok || def.Name != name {
+		if _, ok := e.new().(ui.InteractiveCommand); !ok {
 			continue
 		}
 
@@ -72,12 +77,16 @@ func (r *Registry) Register(ctx context.Context, session *d.Session, appID, guil
 }
 
 func (r *Registry) command(name string) (command.Command, command.Definition) {
-	c, ok := r.commands[name]
+	if real, ok := r.aliases[name]; ok {
+		name = real
+	}
+
+	e, ok := r.commands[name]
 	if !ok {
 		return nil, command.Definition{}
 	}
 
-	return c.new(), c.def
+	return e.new(), e.def
 }
 
 func run[T any](ctx *command.Ctx, def command.Definition, fn func(*command.Ctx) (T, error)) (T, error) {

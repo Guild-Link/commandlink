@@ -1,6 +1,7 @@
 package webhook
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -18,6 +19,11 @@ func (c *Client) Execute(ctx context.Context, channelID string, params *d.Webhoo
 	if err != nil {
 		return nil, err
 	}
+
+	safe := *params
+	safe.Username = username(params.Username)
+	safe.AllowedMentions = cmp.Or(params.AllowedMentions, &d.MessageAllowedMentions{})
+	params = &safe
 
 	message, err := c.session.WebhookExecute(w.ID, w.Token, true, params, d.WithContext(ctx))
 	if !isDeleted(err) {
@@ -38,7 +44,9 @@ func (c *Client) Edit(ctx context.Context, channelID, messageID string, edit *d.
 		return nil, err
 	}
 
-	return c.session.WebhookMessageEdit(w.ID, w.Token, messageID, edit, d.WithContext(ctx))
+	safe := *edit
+	safe.AllowedMentions = cmp.Or(edit.AllowedMentions, &d.MessageAllowedMentions{})
+	return c.session.WebhookMessageEdit(w.ID, w.Token, messageID, &safe, d.WithContext(ctx))
 }
 
 func (c *Client) Get(ctx context.Context, channelID string) (*d.Webhook, error) {
@@ -85,4 +93,11 @@ func (c *Client) Delete(ctx context.Context, channelID string) error {
 func isDeleted(err error) bool {
 	rest, ok := err.(*d.RESTError)
 	return ok && rest.Message != nil && rest.Message.Code == d.ErrCodeUnknownWebhook
+}
+
+func username(name string) string {
+	runes := []rune(name)
+	name = string(runes[:min(len(runes), maxUsername)])
+	name = discordExpr.ReplaceAllString(name, "${1}0${2}")
+	return clydeExpr.ReplaceAllString(name, "${1}3")
 }

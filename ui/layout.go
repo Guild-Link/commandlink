@@ -13,7 +13,7 @@ type container struct {
 }
 
 func (u *UI) Container() *container {
-	c := &container{UI: &UI{session: u.session, target: new([]node)}}
+	c := &container{UI: newUI(u.session)}
 	u.add(c)
 	return c
 }
@@ -56,7 +56,7 @@ func (t *text) Empty(empty string) *text {
 }
 
 func (t *text) Button(label string) *button {
-	t.button = (&UI{session: t.session, target: new([]node)}).Button(label)
+	t.button = newUI(t.session).Button(label)
 	return t.button
 }
 

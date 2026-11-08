@@ -18,6 +18,7 @@ const (
 
 type Registry struct {
 	sessions *expirable.LRU[string, *session]
+	aliases  map[string]string
 	commands map[string]entry
 	timeout  time.Duration
 }

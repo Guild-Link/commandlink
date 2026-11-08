@@ -14,9 +14,9 @@ func (r *Registry) Handle(ctx context.Context, session *d.Session, event *d.Inte
 	i := &interaction{registry: r, ctx: ctx, session: session, event: event, identify: identify}
 	switch event.Type {
 	case d.InteractionApplicationCommand:
-		i.command()
+		i.handleCommand()
 	case d.InteractionApplicationCommandAutocomplete:
-		i.autocomplete()
+		i.handleAutocomplete()
 	case d.InteractionMessageComponent:
 		data := event.MessageComponentData()
 		i.resumeSession(data.CustomID, ui.Event{Selected: data.Values})
@@ -26,7 +26,7 @@ func (r *Registry) Handle(ctx context.Context, session *d.Session, event *d.Inte
 	}
 }
 
-func (i *interaction) command() {
+func (i *interaction) handleCommand() {
 	data := i.event.ApplicationCommandData()
 	cmd, def := i.registry.command(data.Name)
 	c, _ := cmd.(ui.InteractiveCommand)
@@ -41,7 +41,7 @@ func (i *interaction) command() {
 	})
 }
 
-func (i *interaction) autocomplete() {
+func (i *interaction) handleAutocomplete() {
 	data := &d.InteractionResponseData{}
 	defer i.respond(d.InteractionApplicationCommandAutocompleteResult, data)
 

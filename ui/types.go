@@ -25,15 +25,15 @@ type Session struct {
 	pending  map[string]func(Event) error
 	mu       sync.Mutex
 
-	pages   map[int]int
-	selects int
+	pages       map[int]int
+	selectCount int
 
-	open    *d.InteractionResponseData
+	modal   *d.InteractionResponseData
 	command InteractiveCommand
 	ctx     command.Ctx
 	prefix  string
 
-	next int
+	lastID int
 }
 
 type node interface {
