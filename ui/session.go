@@ -58,11 +58,23 @@ func (s *Session) id() string {
 	return s.prefix + ":" + strconv.FormatInt(int64(s.lastID), 36)
 }
 
+func Static() *UI {
+	return newUI(nil)
+}
+
+func (u *UI) Build() []d.MessageComponent {
+	return build(*u.target)
+}
+
 func newUI(s *Session) *UI {
 	return &UI{session: s, target: new([]node)}
 }
 
 func (u *UI) handler(handler func(Event) error) string {
+	if u.session == nil {
+		return ""
+	}
+
 	id := u.session.id()
 	u.session.pending[id] = handler
 	return id
